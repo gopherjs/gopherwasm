@@ -63,12 +63,14 @@ type Value struct {
 }
 
 var (
-	id *js.Object
+	id         *js.Object
+	instanceOf *js.Object
 )
 
 func init() {
 	if js.Global != nil {
 		id = js.Global.Call("eval", "(function(x) { return x; })")
+		instanceOf = js.Global.Call("eval", "(function(x, y) { return x instanceof y; })")
 	}
 }
 
@@ -169,6 +171,10 @@ func (v Value) SetIndex(i int, x interface{}) {
 
 func (v Value) String() string {
 	return v.v.String()
+}
+
+func (v Value) InstanceOf(t Value) bool {
+	return instanceOf.Invoke(v, t).Bool()
 }
 
 func GetInternalObject(v Value) interface{} {

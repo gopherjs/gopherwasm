@@ -64,3 +64,12 @@ func TestInt64(t *testing.T) {
 		t.Errorf("got %#v, want %#v", got, want)
 	}
 }
+
+func TestInstanceOf(t *testing.T) {
+	arr := js.Global.Call("eval", "[]")
+	got := arr.InstanceOf(js.Global.Call("eval", "Array"))
+	want := true
+	if got != want {
+		t.Errorf("got %#v, want %#v", got, want)
+	}
+}
