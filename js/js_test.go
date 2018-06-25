@@ -72,4 +72,35 @@ func TestInstanceOf(t *testing.T) {
 	if got != want {
 		t.Errorf("got %#v, want %#v", got, want)
 	}
+
+	got = arr.InstanceOf(js.Global.Call("eval", "Object"))
+	want = true
+	if got != want {
+		t.Errorf("got %#v, want %#v", got, want)
+	}
+
+	got = arr.InstanceOf(js.Global.Call("eval", "String"))
+	want = false
+	if got != want {
+		t.Errorf("got %#v, want %#v", got, want)
+	}
+
+	str := js.Global.Call("eval", "String").New()
+	got = str.InstanceOf(js.Global.Call("eval", "Array"))
+	want = false
+	if got != want {
+		t.Errorf("got %#v, want %#v", got, want)
+	}
+
+	got = str.InstanceOf(js.Global.Call("eval", "Object"))
+	want = true
+	if got != want {
+		t.Errorf("got %#v, want %#v", got, want)
+	}
+
+	got = str.InstanceOf(js.Global.Call("eval", "String"))
+	want = true
+	if got != want {
+		t.Errorf("got %#v, want %#v", got, want)
+	}
 }
