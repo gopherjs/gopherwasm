@@ -49,7 +49,7 @@ var (
 	uint32Array  = js.Global().Get("Uint32Array")
 	uint64Array  = js.Global().Get("Uint64Array")
 	float32Array = js.Global().Get("Float32Array")
-	float64Array = js.Global() .Get("Float64Array")
+	float64Array = js.Global().Get("Float64Array")
 )
 
 func ValueOf(x interface{}) Value {
