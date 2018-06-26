@@ -13,9 +13,9 @@ import (
 )
 
 var (
-	Undefined = js.Undefined
-	Null      = js.Null
-	Global    = js.Global
+	Undefined = js.Undefined()
+	Null      = js.Null()
+	Global    = js.Global()
 )
 
 type Callback = js.Callback
@@ -41,15 +41,15 @@ type Error = js.Error
 type Value = js.Value
 
 var (
-	int8Array    = js.Global.Get("Int8Array")
-	int16Array   = js.Global.Get("Int16Array")
-	int32Array   = js.Global.Get("Int32Array")
-	int64Array   = js.Global.Get("Int64Array")
-	uint16Array  = js.Global.Get("Uint16Array")
-	uint32Array  = js.Global.Get("Uint32Array")
-	uint64Array  = js.Global.Get("Uint64Array")
-	float32Array = js.Global.Get("Float32Array")
-	float64Array = js.Global.Get("Float64Array")
+	int8Array    = js.Global().Get("Int8Array")
+	int16Array   = js.Global().Get("Int16Array")
+	int32Array   = js.Global().Get("Int32Array")
+	int64Array   = js.Global().Get("Int64Array")
+	uint16Array  = js.Global().Get("Uint16Array")
+	uint32Array  = js.Global().Get("Uint32Array")
+	uint64Array  = js.Global().Get("Uint64Array")
+	float32Array = js.Global().Get("Float32Array")
+	float64Array = js.Global() .Get("Float64Array")
 )
 
 func ValueOf(x interface{}) Value {
