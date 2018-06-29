@@ -13,7 +13,7 @@ import (
 
 func TestNull(t *testing.T) {
 	want := "null"
-	if got := js.Null.String(); got != want {
+	if got := js.Null().String(); got != want {
 		t.Errorf("got %#v, want %#v", got, want)
 	}
 }
@@ -40,7 +40,7 @@ func TestCallbackObject(t *testing.T) {
 	})
 	defer c.Close()
 
-	js.ValueOf(c).Invoke(js.Global.Call("eval", `({"foo": "bar"})`))
+	js.ValueOf(c).Invoke(js.Global().Call("eval", `({"foo": "bar"})`))
 	got := <-ch
 	want := "bar"
 	if got != want {
@@ -49,7 +49,7 @@ func TestCallbackObject(t *testing.T) {
 }
 
 func TestString(t *testing.T) {
-	obj := js.Global.Call("eval", "'Hello'")
+	obj := js.Global().Call("eval", "'Hello'")
 	got := obj.String()
 	if want := "Hello"; got != want {
 		t.Errorf("got %#v, want %#v", got, want)
@@ -66,39 +66,39 @@ func TestInt64(t *testing.T) {
 }
 
 func TestInstanceOf(t *testing.T) {
-	arr := js.Global.Call("eval", "[]")
-	got := arr.InstanceOf(js.Global.Call("eval", "Array"))
+	arr := js.Global().Call("eval", "[]")
+	got := arr.InstanceOf(js.Global().Call("eval", "Array"))
 	want := true
 	if got != want {
 		t.Errorf("got %#v, want %#v", got, want)
 	}
 
-	got = arr.InstanceOf(js.Global.Call("eval", "Object"))
+	got = arr.InstanceOf(js.Global().Call("eval", "Object"))
 	want = true
 	if got != want {
 		t.Errorf("got %#v, want %#v", got, want)
 	}
 
-	got = arr.InstanceOf(js.Global.Call("eval", "String"))
+	got = arr.InstanceOf(js.Global().Call("eval", "String"))
 	want = false
 	if got != want {
 		t.Errorf("got %#v, want %#v", got, want)
 	}
 
-	str := js.Global.Call("eval", "String").New()
-	got = str.InstanceOf(js.Global.Call("eval", "Array"))
+	str := js.Global().Call("eval", "String").New()
+	got = str.InstanceOf(js.Global().Call("eval", "Array"))
 	want = false
 	if got != want {
 		t.Errorf("got %#v, want %#v", got, want)
 	}
 
-	got = str.InstanceOf(js.Global.Call("eval", "Object"))
+	got = str.InstanceOf(js.Global().Call("eval", "Object"))
 	want = true
 	if got != want {
 		t.Errorf("got %#v, want %#v", got, want)
 	}
 
-	got = str.InstanceOf(js.Global.Call("eval", "String"))
+	got = str.InstanceOf(js.Global().Call("eval", "String"))
 	want = true
 	if got != want {
 		t.Errorf("got %#v, want %#v", got, want)

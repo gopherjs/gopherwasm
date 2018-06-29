@@ -12,11 +12,17 @@ import (
 	"unsafe"
 )
 
-var (
-	Undefined = js.Undefined()
-	Null      = js.Null()
-	Global    = js.Global()
-)
+func Global() Value {
+	return js.Global()
+}
+
+func Null() Value {
+	return js.Null()
+}
+
+func Undefined() Value {
+	return js.Undefined()
+}
 
 type Callback = js.Callback
 

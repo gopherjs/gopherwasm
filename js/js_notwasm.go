@@ -7,17 +7,23 @@
 package js
 
 import (
-	"fmt"
+	"reflect"
 	"unsafe"
 
 	"github.com/gopherjs/gopherjs/js"
 )
 
-var (
-	Undefined = Value{v: js.Undefined}
-	Null      = Value{v: nil}
-	Global    = Value{v: js.Global}
-)
+func Global() Value {
+	return Value{v: js.Global}
+}
+
+func Null() Value {
+	return Value{v: nil}
+}
+
+func Undefined() Value {
+	return Value{v: js.Undefined}
+}
 
 type Callback struct {
 	f     func([]Value)
@@ -106,13 +112,13 @@ func ValueOf(x interface{}) Value {
 			}),
 		}
 	case nil:
-		return Null
+		return Null()
 	case bool, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, unsafe.Pointer, string, []byte:
 		return Value{v: id.Invoke(x)}
 	case []int8, []int16, []int32, []int64, []uint16, []uint32, []uint64, []float32, []float64:
 		return Value{v: id.Invoke(x)}
 	default:
-		panic(fmt.Sprintf("invalid arg: %T", x))
+		panic(`invalid arg: ` + reflect.TypeOf(x).String())
 	}
 }
 
