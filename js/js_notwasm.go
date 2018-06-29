@@ -53,7 +53,7 @@ func NewEventCallback(flags EventCallbackFlag, fn func(event Value)) Callback {
 	}
 }
 
-func (c Callback) Close() {
+func (c Callback) Release() {
 }
 
 type Error struct {
