@@ -57,11 +57,11 @@ func (c Callback) Release() {
 }
 
 type Error struct {
-	e *js.Error
+	Value
 }
 
 func (e Error) Error() string {
-	return e.e.Error()
+	return "JavaScript error: " + e.Get("message").String()
 }
 
 type Value struct {
