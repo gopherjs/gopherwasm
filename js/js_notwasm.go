@@ -26,8 +26,7 @@ func Undefined() Value {
 }
 
 type Callback struct {
-	f     func([]Value)
-	flags EventCallbackFlag
+	Value
 }
 
 type EventCallbackFlag int
@@ -38,8 +37,39 @@ const (
 	StopImmediatePropagation
 )
 
+func funcToValue(flags EventCallbackFlag, f func([]Value)) Value {
+	return Value{
+		v: id.Invoke(func(args ...*js.Object) {
+			if len(args) > 0 {
+				e := args[0]
+				if flags&PreventDefault != 0 {
+					e.Call("preventDefault")
+				}
+				if flags&StopPropagation != 0 {
+					e.Call("stopPropagation")
+				}
+				if flags&StopImmediatePropagation != 0 {
+					e.Call("stopImmediatePropagation")
+				}
+			}
+
+			// Call the function asyncly to emulate Wasm's Callback more
+			// precisely.
+			go func() {
+				newArgs := []Value{}
+				for _, arg := range args {
+					newArgs = append(newArgs, Value{v: arg})
+				}
+				f(newArgs)
+			}()
+		}),
+	}
+}
+
 func NewCallback(f func([]Value)) Callback {
-	return Callback{f: f}
+	return Callback{
+		Value: funcToValue(0, f),
+	}
 }
 
 func NewEventCallback(flags EventCallbackFlag, fn func(event Value)) Callback {
@@ -48,12 +78,12 @@ func NewEventCallback(flags EventCallbackFlag, fn func(event Value)) Callback {
 		fn(e)
 	}
 	return Callback{
-		f:     f,
-		flags: flags,
+		Value: funcToValue(flags, f),
 	}
 }
 
 func (c Callback) Release() {
+	c.Value = Null()
 }
 
 type Error struct {
@@ -85,32 +115,7 @@ func ValueOf(x interface{}) Value {
 	case Value:
 		return x
 	case Callback:
-		return Value{
-			v: id.Invoke(func(args ...*js.Object) {
-				if len(args) > 0 {
-					e := args[0]
-					if x.flags&PreventDefault != 0 {
-						e.Call("preventDefault")
-					}
-					if x.flags&StopPropagation != 0 {
-						e.Call("stopPropagation")
-					}
-					if x.flags&StopImmediatePropagation != 0 {
-						e.Call("stopImmediatePropagation")
-					}
-				}
-
-				// Call the function asyncly to emulate Wasm's Callback more
-				// precisely.
-				go func() {
-					newArgs := []Value{}
-					for _, arg := range args {
-						newArgs = append(newArgs, Value{v: arg})
-					}
-					x.f(newArgs)
-				}()
-			}),
-		}
+		return x.Value
 	case nil:
 		return Null()
 	case bool, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, unsafe.Pointer, string, []byte:
