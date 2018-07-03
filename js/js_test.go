@@ -23,7 +23,7 @@ func TestCallback(t *testing.T) {
 	c := js.NewCallback(func(args []js.Value) {
 		ch <- args[0].Int() + args[1].Int()
 	})
-	defer c.Close()
+	defer c.Release()
 
 	js.ValueOf(c).Invoke(1, 2)
 	got := <-ch
@@ -38,7 +38,7 @@ func TestCallbackObject(t *testing.T) {
 	c := js.NewCallback(func(args []js.Value) {
 		ch <- args[0].Get("foo").String()
 	})
-	defer c.Close()
+	defer c.Release()
 
 	js.ValueOf(c).Invoke(js.Global().Call("eval", `({"foo": "bar"})`))
 	got := <-ch
@@ -103,4 +103,26 @@ func TestInstanceOf(t *testing.T) {
 	if got != want {
 		t.Errorf("got %#v, want %#v", got, want)
 	}
+}
+
+func TestTypedArrayOf(t *testing.T) {
+	testTypedArrayOf(t, "[]int8", []int8{0, -42, 0}, -42)
+	testTypedArrayOf(t, "[]int16", []int16{0, -42, 0}, -42)
+	testTypedArrayOf(t, "[]int32", []int32{0, -42, 0}, -42)
+	testTypedArrayOf(t, "[]uint8", []uint8{0, 42, 0}, 42)
+	testTypedArrayOf(t, "[]uint16", []uint16{0, 42, 0}, 42)
+	testTypedArrayOf(t, "[]uint32", []uint32{0, 42, 0}, 42)
+	testTypedArrayOf(t, "[]float32", []float32{0, -42.5, 0}, -42.5)
+	testTypedArrayOf(t, "[]float64", []float64{0, -42.5, 0}, -42.5)
+}
+
+func testTypedArrayOf(t *testing.T, name string, slice interface{}, want float64) {
+	t.Run(name, func(t *testing.T) {
+		a := js.TypedArrayOf(slice)
+		got := a.Index(1).Float()
+		a.Release()
+		if got != want {
+			t.Errorf("got %#v, want %#v", got, want)
+		}
+	})
 }

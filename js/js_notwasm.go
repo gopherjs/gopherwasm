@@ -116,11 +116,14 @@ func ValueOf(x interface{}) Value {
 		return x
 	case Callback:
 		return x.Value
+	case TypedArray:
+		return x.Value
 	case nil:
 		return Null()
 	case bool, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, unsafe.Pointer, string, []byte:
 		return Value{v: id.Invoke(x)}
 	case []int8, []int16, []int32, []int64, []uint16, []uint32, []uint64, []float32, []float64:
+		// TODO: Now slices must be passed to TypedArrayOf. Remove this.
 		return Value{v: id.Invoke(x)}
 	default:
 		panic(`invalid arg: ` + reflect.TypeOf(x).String())
@@ -186,6 +189,23 @@ func (v Value) String() string {
 
 func (v Value) InstanceOf(t Value) bool {
 	return instanceOf.Invoke(v, t).Bool()
+}
+
+type TypedArray struct {
+	Value
+}
+
+func TypedArrayOf(slice interface{}) *TypedArray {
+	switch slice := slice.(type) {
+	case []int8, []int16, []int32, []uint8, []uint16, []uint32, []float32, []float64:
+		return &TypedArray{Value{v: id.Invoke(slice)}};
+	default:
+		panic("TypedArrayOf: not a supported slice")
+	}
+}
+
+func (t *TypedArray) Release() {
+	t.Value = Null()
 }
 
 func GetInternalObject(v Value) interface{} {
