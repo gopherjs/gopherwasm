@@ -50,10 +50,8 @@ var (
 	int8Array    = js.Global().Get("Int8Array")
 	int16Array   = js.Global().Get("Int16Array")
 	int32Array   = js.Global().Get("Int32Array")
-	int64Array   = js.Global().Get("Int64Array")
 	uint16Array  = js.Global().Get("Uint16Array")
 	uint32Array  = js.Global().Get("Uint32Array")
-	uint64Array  = js.Global().Get("Uint64Array")
 	float32Array = js.Global().Get("Float32Array")
 	float64Array = js.Global().Get("Float64Array")
 )
@@ -62,6 +60,7 @@ func ValueOf(x interface{}) Value {
 	var xh *reflect.SliceHeader
 	var class js.Value
 	size := 0
+	// TODO: Now slices must be passed to TypedArrayOf. Remove this.
 	switch x := x.(type) {
 	case []int8:
 		size = 1
@@ -111,6 +110,12 @@ func ValueOf(x interface{}) Value {
 
 	u8 := js.ValueOf(b)
 	return class.New(u8.Get("buffer"), u8.Get("byteOffset"), xh.Len)
+}
+
+type TypedArray = js.TypedArray
+
+func TypedArrayOf(slice interface{}) TypedArray {
+	return js.TypedArrayOf(slice)
 }
 
 func GetInternalObject(v Value) interface{} {
