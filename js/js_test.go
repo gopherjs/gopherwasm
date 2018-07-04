@@ -124,5 +124,13 @@ func testTypedArrayOf(t *testing.T, name string, slice interface{}, want float64
 		if got != want {
 			t.Errorf("got %#v, want %#v", got, want)
 		}
+
+		a2 := js.TypedArrayOf(slice)
+		v := js.ValueOf(a2)
+		got = v.Index(1).Float()
+		a2.Release()
+		if got != want {
+			t.Errorf("got %#v, want %#v", got, want)
+		}
 	})
 }
