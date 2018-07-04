@@ -74,10 +74,6 @@ func ValueOf(x interface{}) Value {
 		size = 4
 		xh = (*reflect.SliceHeader)(unsafe.Pointer(&x))
 		class = int32Array
-	case []int64:
-		size = 8
-		xh = (*reflect.SliceHeader)(unsafe.Pointer(&x))
-		class = int64Array
 	case []uint16:
 		size = 2
 		xh = (*reflect.SliceHeader)(unsafe.Pointer(&x))
@@ -86,10 +82,6 @@ func ValueOf(x interface{}) Value {
 		size = 4
 		xh = (*reflect.SliceHeader)(unsafe.Pointer(&x))
 		class = uint32Array
-	case []uint64:
-		size = 8
-		xh = (*reflect.SliceHeader)(unsafe.Pointer(&x))
-		class = uint64Array
 	case []float32:
 		size = 4
 		xh = (*reflect.SliceHeader)(unsafe.Pointer(&x))
