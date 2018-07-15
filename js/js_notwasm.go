@@ -13,6 +13,42 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
+type Type int
+
+const (
+	TypeUndefined Type = iota
+	TypeNull
+	TypeBoolean
+	TypeNumber
+	TypeString
+	TypeSymbol
+	TypeObject
+	TypeFunction
+)
+
+func (t Type) String() string {
+	switch t {
+	case TypeUndefined:
+		return "undefined"
+	case TypeNull:
+		return "null"
+	case TypeBoolean:
+		return "boolean"
+	case TypeNumber:
+		return "number"
+	case TypeString:
+		return "string"
+	case TypeSymbol:
+		return "symbol"
+	case TypeObject:
+		return "object"
+	case TypeFunction:
+		return "function"
+	default:
+		panic("bad type")
+	}
+}
+
 func Global() Value {
 	return Value{v: js.Global}
 }
@@ -101,12 +137,14 @@ type Value struct {
 var (
 	id         *js.Object
 	instanceOf *js.Object
+	typeOf     *js.Object
 )
 
 func init() {
 	if js.Global != nil {
 		id = js.Global.Call("eval", "(function(x) { return x; })")
 		instanceOf = js.Global.Call("eval", "(function(x, y) { return x instanceof y; })")
+		typeOf = js.Global.Call("eval", "(function(x) { return typeof(x); })")
 	}
 }
 
@@ -186,6 +224,29 @@ func (v Value) String() string {
 
 func (v Value) InstanceOf(t Value) bool {
 	return instanceOf.Invoke(v, t).Bool()
+}
+
+func (v Value) Type() Type {
+	switch v.v {
+	case js.Undefined:
+		return TypeUndefined
+	case nil:
+		return TypeNull
+	}
+	switch typeOf.Invoke(v.v).String() {
+	case "boolean":
+		return TypeBoolean
+	case "number":
+		return TypeNumber
+	case "string":
+		return TypeString
+	case "symbol":
+		return TypeSymbol
+	case "function":
+		return TypeFunction
+	default:
+		return TypeObject
+	}
 }
 
 type TypedArray struct {

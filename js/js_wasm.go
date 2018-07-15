@@ -10,6 +10,19 @@ import (
 	"syscall/js"
 )
 
+type Type = js.Type
+
+const (
+	TypeUndefined Type = js.TypeUndefined
+	TypeNull      Type = js.TypeNull
+	TypeBoolean   Type = js.TypeBoolean
+	TypeNumber    Type = js.TypeNumber
+	TypeString    Type = js.TypeString
+	TypeSymbol    Type = js.TypeSymbol
+	TypeObject    Type = js.TypeObject
+	TypeFunction  Type = js.TypeFunction
+)
+
 func Global() Value {
 	return js.Global()
 }
