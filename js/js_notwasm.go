@@ -189,6 +189,9 @@ func ValueOf(x interface{}) Value {
 }
 
 func (v Value) Bool() bool {
+	if vType := v.Type(); vType != TypeBoolean {
+		panic(&ValueError{"Value.Bool", vType})
+	}
 	return v.v.Bool()
 }
 
@@ -202,10 +205,19 @@ func convertArgs(args []interface{}) []interface{} {
 }
 
 func (v Value) Call(m string, args ...interface{}) Value {
+	if vType := v.Type(); vType != TypeObject && vType != TypeFunction {
+		panic(&ValueError{"Value.Call", vType})
+	}
+	if propType := v.Get(m).Type(); propType != TypeFunction {
+		panic("js: Value.Call: property " + m + " is not a function, got " + propType.String())
+	}
 	return Value{v: v.v.Call(m, convertArgs(args)...)}
 }
 
 func (v Value) Float() float64 {
+	if vType := v.Type(); vType != TypeNumber {
+		panic(&ValueError{"Value.Float", vType})
+	}
 	return v.v.Float()
 }
 
@@ -218,10 +230,16 @@ func (v Value) Index(i int) Value {
 }
 
 func (v Value) Int() int {
+	if vType := v.Type(); vType != TypeNumber {
+		panic(&ValueError{"Value.Int", vType})
+	}
 	return v.v.Int()
 }
 
 func (v Value) Invoke(args ...interface{}) Value {
+	if vType := v.Type(); vType != TypeFunction {
+		panic(&ValueError{"Value.Invoke", vType})
+	}
 	return Value{v: v.v.Invoke(convertArgs(args)...)}
 }
 
@@ -272,4 +290,13 @@ func (t *TypedArray) Release() {
 
 func GetInternalObject(v Value) interface{} {
 	return v.v
+}
+
+type ValueError struct {
+	Method string
+	Type   Type
+}
+
+func (e *ValueError) Error() string {
+	return "syscall/js: call of " + e.Method + " on " + e.Type.String()
 }
