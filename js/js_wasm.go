@@ -13,14 +13,14 @@ import (
 type Type = js.Type
 
 const (
-	TypeUndefined Type = js.TypeUndefined
-	TypeNull      Type = js.TypeNull
-	TypeBoolean   Type = js.TypeBoolean
-	TypeNumber    Type = js.TypeNumber
-	TypeString    Type = js.TypeString
-	TypeSymbol    Type = js.TypeSymbol
-	TypeObject    Type = js.TypeObject
-	TypeFunction  Type = js.TypeFunction
+	TypeUndefined = js.TypeUndefined
+	TypeNull      = js.TypeNull
+	TypeBoolean   = js.TypeBoolean
+	TypeNumber    = js.TypeNumber
+	TypeString    = js.TypeString
+	TypeSymbol    = js.TypeSymbol
+	TypeObject    = js.TypeObject
+	TypeFunction  = js.TypeFunction
 )
 
 func Global() Value {

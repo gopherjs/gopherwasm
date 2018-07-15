@@ -256,7 +256,7 @@ type TypedArray struct {
 func TypedArrayOf(slice interface{}) TypedArray {
 	switch slice := slice.(type) {
 	case []int8, []int16, []int32, []uint8, []uint16, []uint32, []float32, []float64:
-		return TypedArray{Value{v: id.Invoke(slice)}};
+		return TypedArray{Value{v: id.Invoke(slice)}}
 	default:
 		panic("TypedArrayOf: not a supported slice")
 	}
