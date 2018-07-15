@@ -54,6 +54,12 @@ func TestString(t *testing.T) {
 	if want := "Hello"; got != want {
 		t.Errorf("got %#v, want %#v", got, want)
 	}
+
+	obj = js.Global().Call("eval", "123")
+	got = obj.String()
+	if want := "123"; got != want {
+		t.Errorf("got %#v, want %#v", got, want)
+	}
 }
 
 func TestInt64(t *testing.T) {
