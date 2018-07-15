@@ -13,6 +13,42 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
+type Type int
+
+const (
+	TypeUndefined Type = iota
+	TypeNull
+	TypeBoolean
+	TypeNumber
+	TypeString
+	TypeSymbol
+	TypeObject
+	TypeFunction
+)
+
+func (t Type) String() string {
+	switch t {
+	case TypeUndefined:
+		return "undefined"
+	case TypeNull:
+		return "null"
+	case TypeBoolean:
+		return "boolean"
+	case TypeNumber:
+		return "number"
+	case TypeString:
+		return "string"
+	case TypeSymbol:
+		return "symbol"
+	case TypeObject:
+		return "object"
+	case TypeFunction:
+		return "function"
+	default:
+		panic("bad type")
+	}
+}
+
 func Global() Value {
 	return Value{v: js.Global}
 }
@@ -99,14 +135,39 @@ type Value struct {
 }
 
 var (
-	id         *js.Object
-	instanceOf *js.Object
+	id           *js.Object
+	instanceOf   *js.Object
+	getValueType *js.Object
 )
 
 func init() {
 	if js.Global != nil {
 		id = js.Global.Call("eval", "(function(x) { return x; })")
 		instanceOf = js.Global.Call("eval", "(function(x, y) { return x instanceof y; })")
+		getValueType = js.Global.Call("eval", `(function(x) {
+  if (typeof(x) === "undefined") {
+    return 0; // TypeUndefined
+  }
+  if (x === null) {
+    return 1; // TypeNull
+  }
+  if (typeof(x) === "boolean") {
+    return 2; // TypeBoolean
+  }
+  if (typeof(x) === "number") {
+    return 3; // TypeNumber
+  }
+  if (typeof(x) === "string") {
+    return 4; // TypeString
+  }
+  if (typeof(x) === "symbol") {
+    return 5; // TypeSymbol
+  }
+  if (typeof(x) === "function") {
+    return 7; // TypeFunction
+  }
+  return 6; // TypeObject
+})`)
 	}
 }
 
@@ -188,6 +249,10 @@ func (v Value) InstanceOf(t Value) bool {
 	return instanceOf.Invoke(v, t).Bool()
 }
 
+func (v Value) Type() Type {
+	return Type(getValueType.Invoke(v).Int())
+}
+
 type TypedArray struct {
 	Value
 }
@@ -195,7 +260,7 @@ type TypedArray struct {
 func TypedArrayOf(slice interface{}) TypedArray {
 	switch slice := slice.(type) {
 	case []int8, []int16, []int32, []uint8, []uint16, []uint32, []float32, []float64:
-		return TypedArray{Value{v: id.Invoke(slice)}};
+		return TypedArray{Value{v: id.Invoke(slice)}}
 	default:
 		panic("TypedArrayOf: not a supported slice")
 	}
