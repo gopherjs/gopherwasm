@@ -135,16 +135,39 @@ type Value struct {
 }
 
 var (
-	id         *js.Object
-	instanceOf *js.Object
-	typeOf     *js.Object
+	id           *js.Object
+	instanceOf   *js.Object
+	getValueType *js.Object
 )
 
 func init() {
 	if js.Global != nil {
 		id = js.Global.Call("eval", "(function(x) { return x; })")
 		instanceOf = js.Global.Call("eval", "(function(x, y) { return x instanceof y; })")
-		typeOf = js.Global.Call("eval", "(function(x) { return typeof(x); })")
+		getValueType = js.Global.Call("eval", `(function(x) {
+  if (typeof(x) === "undefined") {
+    return 0; // TypeUndefined
+  }
+  if (x === null) {
+    return 1; // TypeNull
+  }
+  if (typeof(x) === "boolean") {
+    return 2; // TypeBoolean
+  }
+  if (typeof(x) === "number") {
+    return 3; // TypeNumber
+  }
+  if (typeof(x) === "string") {
+    return 4; // TypeString
+  }
+  if (typeof(x) === "symbol") {
+    return 5; // TypeSymbol
+  }
+  if (typeof(x) === "function") {
+    return 7; // TypeFunction
+  }
+  return 6; // TypeObject
+})`)
 	}
 }
 
@@ -227,26 +250,7 @@ func (v Value) InstanceOf(t Value) bool {
 }
 
 func (v Value) Type() Type {
-	switch v.v {
-	case js.Undefined:
-		return TypeUndefined
-	case nil:
-		return TypeNull
-	}
-	switch typeOf.Invoke(v.v).String() {
-	case "boolean":
-		return TypeBoolean
-	case "number":
-		return TypeNumber
-	case "string":
-		return TypeString
-	case "symbol":
-		return TypeSymbol
-	case "function":
-		return TypeFunction
-	default:
-		return TypeObject
-	}
+	return Type(getValueType.Invoke(v).Int())
 }
 
 type TypedArray struct {
