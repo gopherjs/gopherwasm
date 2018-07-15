@@ -122,9 +122,6 @@ func ValueOf(x interface{}) Value {
 		return Null()
 	case bool, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, unsafe.Pointer, string, []byte:
 		return Value{v: id.Invoke(x)}
-	case []int8, []int16, []int32, []int64, []uint16, []uint32, []uint64, []float32, []float64:
-		// TODO: Now slices must be passed to TypedArrayOf. Remove this.
-		return Value{v: id.Invoke(x)}
 	default:
 		panic(`invalid arg: ` + reflect.TypeOf(x).String())
 	}
