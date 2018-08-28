@@ -18,6 +18,6 @@ install:
   - export PATH=$(go env GOPATH)/bin:$PATH
 
 script:
-  - cd /tmp/wpork
+  - cd /tmp/work
   - GOOS=js GOARCH=wasm go test github.com/gopherjs/gopherwasm/...
   - gopherjs test github.com/gopherjs/gopherjs/...
