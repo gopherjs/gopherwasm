@@ -1,17 +1,23 @@
 language: go
 
+sudo: false
+
 go:
   - "1.11"
 
 install:
+  - nvm install node
+  - nvm use node
   - mkdir /tmp/work
   - cd /tmp/work
   - go mod init example.com/m
   - go get github.com/gopherjs/gopherwasm@master
   - GO111MODULE=off go get github.com/gopherjs/gopherjs/...
   - GO111MODULE=off go get github.com/gopherjs/gopherwasm/...
+  - ln -s $(go env GOROOT)/misc/wasm/go_js_wasm_exec $(go env GOPATH)/bin
+  - export PATH=$(go env GOPATH)/bin:$PATH
 
 script:
   - cd /tmp/wpork
   - GOOS=js GOARCH=wasm go test github.com/gopherjs/gopherwasm/...
-  - gopherjs github.com/gopherjs/gopherjs/...
+  - gopherjs test github.com/gopherjs/gopherjs/...
