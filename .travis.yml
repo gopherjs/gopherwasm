@@ -1,7 +1,10 @@
 sudo: false
 
+# Use the original Go 1.11 instead of the Go 1.11 installed by gimme.
+# It looks like gimme Go causes some errors on go-test for Wasm.
+
 install:
-  - wget -O go.tar.gz https://dl.google.com/go/go1.11.linux-amd64.tar.gz # Install the original Go 1.11
+  - wget -O go.tar.gz https://dl.google.com/go/go1.11.linux-amd64.tar.gz
   - tar -C ~ -xzf go.tar.gz
   - rm go.tar.gz
   - export GOROOT=~/go
