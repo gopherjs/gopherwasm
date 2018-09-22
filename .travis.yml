@@ -14,8 +14,7 @@ install:
   - go get github.com/gopherjs/gopherwasm@master
   - GO111MODULE=off go get github.com/gopherjs/gopherjs/...
   - GO111MODULE=off go get github.com/gopherjs/gopherwasm/...
-  - ln -s $(go env GOROOT)/misc/wasm/go_js_wasm_exec $(go env GOPATH)/bin
-  - export PATH=$(go env GOPATH)/bin:$PATH
+  - export PATH=$(go env GOROOT)/misc/wasm:$PATH
 
 script:
   - cd /tmp/work
