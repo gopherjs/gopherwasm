@@ -1,11 +1,11 @@
-language: go
-
 sudo: false
 
-go:
-  - "1.11"
-
 install:
+  - wget -O go.tar.gz https://dl.google.com/go/go1.11.linux-amd64.tar.gz # Install the original Go 1.11
+  - tar -C ~ -xzf go.tar.gz
+  - rm go.tar.gz
+  - export GOROOT=~/go
+  - export PATH=$GOROOT/bin:$PATH
   - nvm install node
   - nvm use node
   - mkdir /tmp/work
