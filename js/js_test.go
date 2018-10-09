@@ -5,6 +5,7 @@
 package js_test
 
 import (
+	"fmt"
 	"math"
 	"testing"
 
@@ -165,5 +166,61 @@ func TestType(t *testing.T) {
 	}
 	if got, want := js.Global().Get("Array").Type(), js.TypeFunction; got != want {
 		t.Errorf("got %s, want %s", got, want)
+	}
+}
+
+func TestValueOf(t *testing.T) {
+	JSON := js.Global().Get("JSON")
+	for _, test := range []struct {
+		in         interface{}
+		wantType   js.Type
+		wantString string
+	}{
+		{js.Value(js.ValueOf(42)), js.TypeNumber, "42"},
+		{js.NewCallback(func(args []js.Value) {}), js.TypeFunction, ""},
+		{js.TypedArrayOf([]int8{1, 2, 3}), js.TypeObject, `{"0":1,"1":2,"2":3}`},
+		{nil, js.TypeNull, "null"},
+		{bool(true), js.TypeBoolean, "true"},
+		{int(1), js.TypeNumber, "1"},
+		{int8(2), js.TypeNumber, "2"},
+		{int16(3), js.TypeNumber, "3"},
+		{int32(4), js.TypeNumber, "4"},
+		{int64(5), js.TypeNumber, "5"},
+		{uint(6), js.TypeNumber, "6"},
+		{uint8(7), js.TypeNumber, "7"},
+		{uint16(8), js.TypeNumber, "8"},
+		{uint32(9), js.TypeNumber, "9"},
+		{uint64(10), js.TypeNumber, "10"},
+		{float32(11), js.TypeNumber, "11"},
+		{float64(12), js.TypeNumber, "12"},
+		// FIXME this doesn't work {unsafe.Pointer(&x19), js.TypeNumber, ""},
+		{string("hello"), js.TypeString, `"hello"`},
+		{map[string]interface{}{"a": 1}, js.TypeObject, `{"a":1}`},
+		{[]interface{}{1, 2, 3}, js.TypeObject, "[1,2,3]"},
+	} {
+		t.Run(fmt.Sprintf("%T", test.in), func(t *testing.T) {
+			got := js.ValueOf(test.in)
+			if got.Type() != test.wantType {
+				t.Errorf("type: got %v want %v", got.Type(), test.wantType)
+			}
+			gotString := JSON.Call("stringify", got).String()
+			if test.wantString != "" && gotString != test.wantString {
+				t.Errorf("string: got %v want %v", gotString, test.wantString)
+			}
+		})
+	}
+
+	// Check unknown types panic
+	didPanic := false
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				didPanic = true
+			}
+		}()
+		_ = js.ValueOf([]struct{}{})
+	}()
+	if !didPanic {
+		t.Errorf("Unknown type didn't panic")
 	}
 }
