@@ -20,6 +20,7 @@ func FuncOf(fn func(this Value, args []Value) interface{}) Func {
 // Callback is for backward compatibility. Use Func instead.
 type Callback = js.Func
 
+// EventCallbackFlag is for backward compatibility.
 type EventCallbackFlag int
 
 const (
