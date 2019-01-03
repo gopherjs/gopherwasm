@@ -4,5 +4,5 @@
 
 // Package js offers API that works with both GopherJS and Wasm.
 //
-// The API emulates syscall/js API, so please refer syscall/js API document (https://golang.org/pkg/syscall/js/?GOOS=js&GOARCH=wasm) for more detail.
+// The API emulates syscall/js API, so please refer syscall/js API document (https://golang.org/pkg/syscall/js/) for more detail.
 package js

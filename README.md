@@ -5,4 +5,4 @@
 
 A wrapper for GopherJS (`gopherjs/js`) and Wasm (`syscall/js`). With this, you can make your application work with both GopherJS and Wasm.
 
-GopherWasm's API emulates `syscall/js`, so please refer [`syscall/js` API document](https://golang.org/pkg/syscall/js/?GOOS=js&GOARCH=wasm) to know how to use API of GopherWasm.
+GopherWasm's API emulates `syscall/js`, so please refer [`syscall/js` API document](https://golang.org/pkg/syscall/js/) to know how to use API of GopherWasm.
