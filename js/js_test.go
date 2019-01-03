@@ -34,6 +34,25 @@ func TestCallback(t *testing.T) {
 	}
 }
 
+func TestFuncObject(t *testing.T) {
+	got := ""
+	f := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		got = args[0].Get("foo").String()
+		return nil
+	})
+	defer f.Release()
+
+	js.ValueOf(f).Invoke(js.Global().Call("eval", `({"foo": "bar"})`))
+	want := "bar"
+	// In Go 1.11 and before on Wasm, functions cannot be called synchronously.
+	if !isFuncSync() {
+		want = ""
+	}
+	if got != want {
+		t.Errorf("got %#v, want %#v", got, want)
+	}
+}
+
 func TestCallbackObject(t *testing.T) {
 	ch := make(chan string)
 	c := js.NewCallback(func(args []js.Value) {
@@ -177,6 +196,7 @@ func TestValueOf(t *testing.T) {
 		wantString string
 	}{
 		{js.Value(js.ValueOf(42)), js.TypeNumber, "42"},
+		{js.FuncOf(func(this js.Value, args []js.Value) interface{} { return nil }), js.TypeFunction, ""},
 		{js.NewCallback(func(args []js.Value) {}), js.TypeFunction, ""},
 		{js.TypedArrayOf([]int8{1, 2, 3}), js.TypeObject, `{"0":1,"1":2,"2":3}`},
 		{nil, js.TypeNull, "null"},

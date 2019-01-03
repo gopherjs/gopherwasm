@@ -61,6 +61,27 @@ func Undefined() Value {
 	return Value{v: js.Undefined}
 }
 
+type Func struct {
+	Value
+}
+
+func (f Func) Release() {
+	f.Value = Null()
+}
+
+func FuncOf(fn func(this Value, args []Value) interface{}) Func {
+	v := Value{
+		v: js.MakeFunc(func(this *js.Object, args []*js.Object) interface{} {
+			vargs := make([]Value, len(args))
+			for i, a := range args {
+				vargs[i] = Value{a}
+			}
+			return fn(Value{this}, vargs)
+		}),
+	}
+	return Func{v}
+}
+
 type Callback struct {
 	Value
 }
@@ -73,7 +94,7 @@ const (
 	StopImmediatePropagation
 )
 
-func funcToValue(flags EventCallbackFlag, f func([]Value)) Value {
+func callbackToValue(flags EventCallbackFlag, f func([]Value)) Value {
 	return Value{
 		v: id.Invoke(func(args ...*js.Object) {
 			if len(args) > 0 {
@@ -104,7 +125,7 @@ func funcToValue(flags EventCallbackFlag, f func([]Value)) Value {
 
 func NewCallback(f func([]Value)) Callback {
 	return Callback{
-		Value: funcToValue(0, f),
+		Value: callbackToValue(0, f),
 	}
 }
 
@@ -114,7 +135,7 @@ func NewEventCallback(flags EventCallbackFlag, fn func(event Value)) Callback {
 		fn(e)
 	}
 	return Callback{
-		Value: funcToValue(flags, f),
+		Value: callbackToValue(flags, f),
 	}
 }
 
@@ -175,6 +196,8 @@ func ValueOf(x interface{}) Value {
 	switch x := x.(type) {
 	case Value:
 		return x
+	case Func:
+		return x.Value
 	case Callback:
 		return x.Value
 	case TypedArray:
