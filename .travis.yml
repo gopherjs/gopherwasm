@@ -1,14 +1,9 @@
-sudo: false
+language: go
 
-# Use the original Go 1.11 instead of the Go 1.11 installed by gimme.
-# It looks like gimme Go causes some errors on go-test for Wasm.
+go:
+  - "1.11"
 
 install:
-  - wget -O go.tar.gz https://dl.google.com/go/go1.11.linux-amd64.tar.gz
-  - tar -C ~ -xzf go.tar.gz
-  - rm go.tar.gz
-  - export GOROOT=~/go
-  - export PATH=$GOROOT/bin:$PATH
   - nvm install node
   - nvm use node
   - mkdir /tmp/work
@@ -21,5 +16,5 @@ install:
 
 script:
   - cd /tmp/work
-  - GOOS=js GOARCH=wasm go test github.com/gopherjs/gopherwasm/js/...
+  - PATH=$(go env GOROOT)/misc/wasm:$PATH GOOS=js GOARCH=wasm go test github.com/gopherjs/gopherwasm/js/...
   - gopherjs test github.com/gopherjs/gopherwasm/js/...
