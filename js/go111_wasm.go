@@ -28,11 +28,3 @@ func NewCallback(f func([]Value)) Callback {
 func NewEventCallback(flags EventCallbackFlag, fn func(event Value)) Callback {
 	return js.NewEventCallback(flags, fn)
 }
-
-type Func = js.Callback
-
-func FuncOf(fn func(this Value, args []Value) interface{}) Func {
-	return NewCallback(func(args []Value) {
-		fn(js.Undefined(), args)
-	})
-}
