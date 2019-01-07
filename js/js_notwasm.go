@@ -70,75 +70,17 @@ func (f Func) Release() {
 }
 
 func FuncOf(fn func(this Value, args []Value) interface{}) Func {
-	v := Value{
-		v: js.MakeFunc(func(this *js.Object, args []*js.Object) interface{} {
-			vargs := make([]Value, len(args))
-			for i, a := range args {
-				vargs[i] = Value{a}
-			}
-			return fn(Value{this}, vargs)
-		}),
-	}
-	return Func{v}
-}
-
-type Callback struct {
-	Value
-}
-
-type EventCallbackFlag int
-
-const (
-	PreventDefault EventCallbackFlag = 1 << iota
-	StopPropagation
-	StopImmediatePropagation
-)
-
-func callbackToValue(flags EventCallbackFlag, f func([]Value)) Value {
-	return Value{
-		v: id.Invoke(func(args ...*js.Object) {
-			e := args[0]
-			if flags&PreventDefault != 0 {
-				e.Call("preventDefault")
-			}
-			if flags&StopPropagation != 0 {
-				e.Call("stopPropagation")
-			}
-			if flags&StopImmediatePropagation != 0 {
-				e.Call("stopImmediatePropagation")
-			}
-
-			// Call the function asyncly to emulate Wasm's Callback more
-			// precisely.
-			go func() {
-				newArgs := []Value{}
-				for _, arg := range args {
-					newArgs = append(newArgs, Value{v: arg})
+	return Func{
+		Value: Value{
+			v: js.MakeFunc(func(this *js.Object, args []*js.Object) interface{} {
+				vargs := make([]Value, len(args))
+				for i, a := range args {
+					vargs[i] = Value{a}
 				}
-				f(newArgs)
-			}()
-		}),
+				return fn(Value{this}, vargs)
+			}),
+		},
 	}
-}
-
-func NewCallback(f func([]Value)) Callback {
-	return Callback{
-		Value: callbackToValue(0, f),
-	}
-}
-
-func NewEventCallback(flags EventCallbackFlag, fn func(event Value)) Callback {
-	f := func(args []Value) {
-		e := args[0]
-		fn(e)
-	}
-	return Callback{
-		Value: callbackToValue(flags, f),
-	}
-}
-
-func (c Callback) Release() {
-	c.Value = Null()
 }
 
 type Error struct {
@@ -195,8 +137,6 @@ func ValueOf(x interface{}) Value {
 	case Value:
 		return x
 	case Func:
-		return x.Value
-	case Callback:
 		return x.Value
 	case TypedArray:
 		return x.Value
