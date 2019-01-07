@@ -97,17 +97,15 @@ const (
 func callbackToValue(flags EventCallbackFlag, f func([]Value)) Value {
 	return Value{
 		v: id.Invoke(func(args ...*js.Object) {
-			if len(args) > 0 {
-				e := args[0]
-				if flags&PreventDefault != 0 {
-					e.Call("preventDefault")
-				}
-				if flags&StopPropagation != 0 {
-					e.Call("stopPropagation")
-				}
-				if flags&StopImmediatePropagation != 0 {
-					e.Call("stopImmediatePropagation")
-				}
+			e := args[0]
+			if flags&PreventDefault != 0 {
+				e.Call("preventDefault")
+			}
+			if flags&StopPropagation != 0 {
+				e.Call("stopPropagation")
+			}
+			if flags&StopImmediatePropagation != 0 {
+				e.Call("stopImmediatePropagation")
 			}
 
 			// Call the function asyncly to emulate Wasm's Callback more

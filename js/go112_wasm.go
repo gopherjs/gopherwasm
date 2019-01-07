@@ -42,18 +42,15 @@ func NewCallback(fn func([]Value)) Callback {
 // NewEventCallback is for backward compatibility. Use FuncOf instead.
 func NewEventCallback(flags EventCallbackFlag, fn func(event Value)) Callback {
 	return FuncOf(func(this Value, args []Value) interface{} {
-		e := js.Undefined()
-		if len(args) > 0 {
-			e = args[0]
-			if flags&PreventDefault != 0 {
-				e.Call("preventDefault")
-			}
-			if flags&StopPropagation != 0 {
-				e.Call("stopPropagation")
-			}
-			if flags&StopImmediatePropagation != 0 {
-				e.Call("stopImmediatePropagation")
-			}
+		e := args[0]
+		if flags&PreventDefault != 0 {
+			e.Call("preventDefault")
+		}
+		if flags&StopPropagation != 0 {
+			e.Call("stopPropagation")
+		}
+		if flags&StopImmediatePropagation != 0 {
+			e.Call("stopImmediatePropagation")
 		}
 		go func() {
 			fn(e)
