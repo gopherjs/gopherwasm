@@ -15,13 +15,18 @@ import (
 func TestFuncObject(t *testing.T) {
 	got := ""
 	f := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		got = args[0].Get("foo").String()
+		got = args[0].Get("foo").String() + this.Get("name").String()
 		return nil
 	})
 	defer f.Release()
 
-	js.ValueOf(f).Invoke(js.Global().Call("eval", `({"foo": "bar"})`))
-	want := "bar"
+	obj := js.Global().Call("eval", `({})`)
+	obj.Set("func", f)
+	obj.Set("name", "baz")
+	arg := js.Global().Call("eval", `({"foo": "bar"})`)
+	obj.Call("func", arg)
+
+	want := "barbaz"
 	if got != want {
 		t.Errorf("got %#v, want %#v", got, want)
 	}
