@@ -4,23 +4,25 @@ sudo: false
 # It looks like gimme Go causes some errors on go-test for Wasm.
 
 install:
-  - wget -O go.tar.gz https://dl.google.com/go/go1.11.linux-amd64.tar.gz
+  - unset GOROOT
+  - wget -O go.tar.gz https://dl.google.com/go/go1.11.4.linux-amd64.tar.gz
   - mkdir ~/gocode
   - tar -C ~/gocode -xzf go.tar.gz
   - rm go.tar.gz
-  - export GOROOT=~/gocode/go
-  - export PATH=$GOROOT/bin:$PATH
+  - export PATH=~/gocode/go/bin:$PATH
+  - go get golang.org/dl/go1.12beta2
+  - go1.12beta2 download
   - nvm install node
   - nvm use node
   - mkdir /tmp/work
   - cd /tmp/work
   - go mod init example.com/m
-  - go get github.com/gopherjs/gopherwasm@master
+  - go get github.com/gopherjs/gopherwasm@$TRAVIS_BRANCH
   - GO111MODULE=off go get github.com/gopherjs/gopherjs/...
   - GO111MODULE=off go get github.com/gopherjs/gopherwasm/...
-  - export PATH=$(go env GOROOT)/misc/wasm:$PATH
 
 script:
   - cd /tmp/work
-  - GOOS=js GOARCH=wasm go test github.com/gopherjs/gopherwasm/js/...
+  - PATH=$(go env GOROOT)/misc/wasm:$PATH GOOS=js GOARCH=wasm go test github.com/gopherjs/gopherwasm/js/...
+  - PATH=$(go1.12beta2 env GOROOT)/misc/wasm:$PATH GOOS=js GOARCH=wasm go1.12beta2 test github.com/gopherjs/gopherwasm/js/...
   - gopherjs test github.com/gopherjs/gopherwasm/js/...
