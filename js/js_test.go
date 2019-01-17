@@ -13,9 +13,11 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	// This TestMain does just the tests, but this mitigates the 'deadlock' error on GopherJS
+	// Mitigate the 'deadlock' error on GopherJS by goroutine
 	// (https://github.com/gopherjs/gopherjs/issues/826).
-	m.Run()
+	go func() {
+		m.Run()
+	}()
 }
 
 func TestNull(t *testing.T) {
