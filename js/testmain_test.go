@@ -11,7 +11,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	// Mitigate the 'deadlock' error on GopherJS by goroutine
+	// Suppress the 'deadlock' error on GopherJS by goroutine
 	// (https://github.com/gopherjs/gopherjs/issues/826).
 	go func() {
 		m.Run()
