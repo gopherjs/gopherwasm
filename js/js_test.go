@@ -12,6 +12,12 @@ import (
 	"github.com/gopherjs/gopherwasm/js"
 )
 
+func TestMain(m *testing.M) {
+	// This TestMain does just the tests, but this mitigates the 'deadlock' error on GopherJS
+	// (https://github.com/gopherjs/gopherjs/issues/826).
+	m.Run()
+}
+
 func TestNull(t *testing.T) {
 	want := "null"
 	if got := js.Null().String(); got != want {
